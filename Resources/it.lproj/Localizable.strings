@@ -1,0 +1,40 @@
+"menu.suggest" = "Suggerisci la finestra da affiancare";
+"menu.thumbnails" = "Mostra anteprime delle finestre";
+"menu.divider" = "Barra di ridimensionamento tra finestre affiancate";
+"menu.permissions" = "Impostazioni…";
+
+"menu.accessibility.granted" = "Accessibilità: consentita";
+"menu.accessibility.needed" = "Accessibilità: da autorizzare";
+"menu.accessibility.request" = "Richiedi accesso Accessibilità…";
+"menu.screen.granted" = "Registrazione schermo: consentita";
+"menu.screen.needed" = "Registrazione schermo: da autorizzare";
+"menu.screen.request" = "Richiedi accesso Registrazione schermo…";
+
+"menu.restart" = "Riavvia Snap Assist";
+"menu.quit" = "Esci da Snap Assist";
+"menu.tooltip" = "Snap Assist — suggerisce la finestra da affiancare";
+
+"picker.title" = "Scegli una finestra da affiancare";
+"picker.hint" = "Esc o clic fuori per annullare";
+"picker.hint.noPreviews" = "Concedi «Registrazione schermo» per le anteprime · Esc per annullare";
+
+"permissions.title" = "Snap Assist";
+"permissions.heading" = "Servono due permessi";
+"permissions.intro" = "Apri ogni pannello, attiva l'interruttore accanto a «Snap Assist» e torna qui: lo stato si aggiorna da solo entro un paio di secondi.";
+"permissions.accessibility" = "Accessibilità";
+"permissions.accessibility.detail" = "Serve per capire quando una finestra viene affiancata e per spostare quella che scegli. Nella lista cerca «Snap Assist» e attiva l'interruttore a destra.";
+"permissions.screen" = "Registrazione schermo";
+"permissions.screen.detail" = "Serve solo per le miniature delle finestre nel pannello di scelta. Senza questo permesso l'app funziona lo stesso, ma mostra le icone.";
+"permissions.status.granted" = "consentita";
+"permissions.status.needed" = "da autorizzare";
+"permissions.open" = "Apri Impostazioni…";
+"permissions.hint" = "Dopo aver concesso la Registrazione schermo, riavvia Snap Assist per applicarla.";
+"permissions.restart" = "Riavvia Snap Assist";
+"permissions.close" = "Chiudi";
+
+"settings.heading" = "Impostazioni";
+"settings.behavior" = "Comportamento";
+"settings.suggest" = "Suggerisci la finestra da affiancare";
+"settings.previews" = "Mostra anteprime delle finestre";
+"settings.divider" = "Barra di ridimensionamento tra finestre affiancate";
+"settings.permissions" = "Permessi";
