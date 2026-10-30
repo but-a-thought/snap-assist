@@ -1,0 +1,61 @@
+"menu.suggest" = "Suggest the window to snap";
+"menu.thumbnails" = "Show window previews";
+"menu.divider" = "Resize divider between side-by-side windows";
+"menu.permissions" = "Settings…";
+
+"menu.accessibility.granted" = "Accessibility: allowed";
+"menu.accessibility.needed" = "Accessibility: needs permission";
+"menu.accessibility.request" = "Request Accessibility access…";
+"menu.screen.granted" = "Screen Recording: allowed";
+"menu.screen.needed" = "Screen Recording: needs permission";
+"menu.screen.request" = "Request Screen Recording access…";
+
+"menu.restart" = "Restart Snap Assist";
+"menu.quit" = "Quit Snap Assist";
+"menu.tooltip" = "Snap Assist — suggests the window to place beside";
+
+"picker.title" = "Choose a window to place beside";
+"picker.hint" = "Esc or click outside to cancel";
+"picker.hint.noPreviews" = "Allow Screen Recording for previews · Esc to cancel";
+
+"permissions.title" = "Snap Assist";
+"permissions.heading" = "Two permissions are needed";
+"permissions.intro" = "Open each panel, turn on the switch next to “Snap Assist”, then come back: the status updates on its own within a couple of seconds.";
+"permissions.accessibility" = "Accessibility";
+"permissions.accessibility.detail" = "Used to detect when a window is snapped and to move the one you choose. In the list, find “Snap Assist” and turn on the switch on the right.";
+"permissions.screen" = "Screen Recording";
+"permissions.screen.detail" = "Only used for the window thumbnails in the picker. Without it the app still works, but shows app icons instead.";
+"permissions.status.granted" = "allowed";
+"permissions.status.needed" = "needs permission";
+"permissions.open" = "Open Settings…";
+"permissions.hint" = "After granting Screen Recording, restart Snap Assist to apply it.";
+"permissions.restart" = "Restart Snap Assist";
+"permissions.close" = "Close";
+
+"settings.heading" = "Settings";
+"settings.behavior" = "Behavior";
+"settings.suggest" = "Suggest the window to snap";
+"settings.previews" = "Show window previews";
+"settings.divider" = "Resize divider between side-by-side windows";
+"settings.permissions" = "Permissions";
+
+"settings.login" = "Launch at login";
+"settings.layouts" = "Layouts";
+"settings.layouts.hint" = "Hold Shift and drag a window by its title bar: the zones appear in an overlay, drop the window on one to place it there.";
+"settings.layouts.edit" = "Edit layout…";
+
+"layout.title" = "Layouts";
+"layout.hint" = "Choose the zones shown while you hold Shift and drag a window by its title bar.";
+"layout.custom" = "Custom layout";
+"layout.generate" = "Generate grid";
+"layout.clear" = "Clear";
+"layout.delete" = "Delete";
+"layout.drawHint" = "Drag to draw a zone";
+"layout.columns" = "Columns";
+"layout.rows" = "Rows";
+"layout.done" = "Done";
+
+"login.error.title" = "Could not change the login item";
+"login.error.message" = "Add Snap Assist manually in System Settings → General → Login Items.";
+"login.approval.title" = "Approval needed";
+"login.approval.message" = "Approve Snap Assist in System Settings → General → Login Items to start it at login.";
