@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark"><meta name="referrer" content="no-referrer"><title>Snap Assist — Signed arm64 builds</title>
+<style>
+:root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#10151d;color:#edf2fa;font:16px/1.65 system-ui,-apple-system,sans-serif}main{max-width:960px;margin:auto;padding:36px 24px 64px}h1,h2{line-height:1.2}h1{font-size:2.5rem}h2{margin-top:34px}a{color:#91caff}code{font:14px/1.65 ui-monospace,SFMono-Regular,monospace;overflow-wrap:anywhere}pre{white-space:pre-wrap;background:#172231;border:1px solid #48617e;padding:16px;border-radius:9px}.copy{display:flex;justify-content:flex-end}button{background:#29496c;color:white;border:1px solid #8cb4df;border-radius:7px;font:600 14px system-ui;padding:9px 14px;cursor:pointer;min-height:40px}button:focus-visible,a:focus-visible{outline:3px solid #ffda89;outline-offset:4px}.note{padding:18px;border:1px solid #8f784e;border-radius:10px;background:#29271f}.muted{color:#b9c7d9}li{margin:8px 0}#status{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:#203d2e;color:#e5fff0;border:1px solid #91d8ac;border-radius:9px;padding:10px 18px;max-width:90vw}#status:empty{display:none}
+</style></head><body><main>
+<h1>Signed arm64 builds</h1>
+<p>This branch provides Developer ID signing, verified packaging, and a fixed installation location. Both Debug and Release target Apple silicon only. The original MIT license and attribution remain in the app.</p>
+<p class="note">The upstream self-signed setup helper is retired. Do not follow the original README’s local-key setup instructions for this branch. Use an existing <strong>Developer ID Application</strong> identity in your login keychain. No private-key export is required.</p>
+<h2>1. Choose an installed signing identity</h2>
+<p>Use a Mac with Xcode installed and a Developer ID Application certificate with its private key available in your login keychain. View the available identities:</p>
+<pre><code id="identities">security find-identity -v -p codesigning</code></pre><div class="copy"><button type="button" data-copy="identities">Copy identity command</button></div>
+<p>In Terminal, change to this repository’s folder. Set these two inputs, replacing the placeholders with your identity fingerprint and Team ID. Apple Development and ad-hoc identities will not pass the installer’s Developer ID checks.</p>
+<pre><code id="config">export SIGN_IDENTITY='YOUR_DEVELOPER_ID_APPLICATION_FINGERPRINT'
+export EXPECTED_TEAM_ID='YOUR_TEAM_ID'</code></pre><div class="copy"><button type="button" data-copy="config">Copy signing settings</button></div>
+<p>Personal wrappers may be stored in the ignored local directory below. Keep private keys in your keychain; use 1Password for any separately needed secrets.</p>
+<pre><code id="local">.local/</code></pre><div class="copy"><button type="button" data-copy="local">Copy local directory</button></div>
+<h2>2. Build and verify</h2>
+<p>The builder selects Xcode through a scoped developer directory, builds arm64, packages resources, signs with hardened runtime and a secure timestamp, and verifies the result before replacing a previous build. A missing identity, failed signature, wrong Team ID, or unexpected architecture stops the workflow.</p>
+<pre><code id="release">bash scripts/build-app.sh release</code></pre><div class="copy"><button type="button" data-copy="release">Copy Release build</button></div>
+<pre><code id="debug">bash scripts/build-app.sh debug</code></pre><div class="copy"><button type="button" data-copy="debug">Copy Debug build</button></div>
+<p>Outputs:</p>
+<pre><code id="outputs">dist/release/SnapAssist.app
+dist/debug/SnapAssist.app</code></pre><div class="copy"><button type="button" data-copy="outputs">Copy output paths</button></div>
+<h2>3. Install and open Release</h2>
+<p>This command builds, verifies, and installs Release. Installation gracefully quits the installed instance, verifies a temporary copy, and retains any previous app at the backup location printed by the installer. Replacement failures attempt to restore that backup.</p>
+<pre><code id="install">bash scripts/build-app.sh release install</code></pre><div class="copy"><button type="button" data-copy="install">Copy build and install</button></div>
+<pre><code id="open">open /Applications/SnapAssist.app</code></pre><div class="copy"><button type="button" data-copy="open">Copy launch command</button></div>
+<p>The stable installation location and bundle identifier are:</p>
+<pre><code id="path">/Applications/SnapAssist.app</code></pre><div class="copy"><button type="button" data-copy="path">Copy installation path</button></div>
+<pre><code id="bundle">com.frank.snapassist</code></pre><div class="copy"><button type="button" data-copy="bundle">Copy bundle ID</button></div>
+<h2>4. Grant permissions once</h2>
+<p>In System Settings → Privacy &amp; Security → Accessibility, enable Snap Assist. Screen Recording is optional: it enables window thumbnails; without it the picker shows icons. Restart the app using its menu if macOS requests it after a permission change.</p>
+<p>Future builds should use the same bundle ID and Developer ID signing requirement. Validate permission persistence on your Mac; do not reset privacy permissions as part of rebuilding. This personal workflow does not notarize the app or create a distribution package.</p>
+<p>To show suggestions, newly snap a window to a left or right half, for example with Window → Move &amp; Resize → Left. Clicking an already tiled window does not reopen the picker. Detection polls every 120 milliseconds and waits for two matching readings; animation and thumbnail loading can add latency.</p>
+<h2>Security changes</h2>
+<ul><li>Persistent Shift-drag logging removed; existing log files are left untouched.</li><li>Centering installs its global event monitor only while enabled, and clears gesture state when disabled.</li><li>Both restart actions use the same shell-free helper mode, waiting up to ten seconds for the old process to exit. A timeout does not launch another instance.</li><li>Signing failure cannot install or replace a previous verified build. No key-generating helper remains active.</li><li>The ordinary full-screen Dock canvas no longer suppresses the picker or all resize dividers. Mission Control suppression distinguishes legacy Dock layer 18 from macOS 27 WindowManager layer 19. These system compositor details remain heuristics and may change in future macOS versions.</li></ul>
+<h2>Regression checks</h2>
+<p>The workflow tests use mocked compiler/signing boundaries and do not use your signing key. Swift tests exercise the monitor lifecycle and restart behavior.</p>
+<pre><code id="tests">python3 Tests/build-workflow-tests.py
+DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer xcrun swift test --arch arm64</code></pre><div class="copy"><button type="button" data-copy="tests">Copy test commands</button></div>
+<p>The executable’s existing self-check can print personal window titles. Inspect its output before sharing. Full functional tests may move a foreground window; use disposable test windows.</p>
+<pre><code id="check">/Applications/SnapAssist.app/Contents/MacOS/SnapAssist --check</code></pre><div class="copy"><button type="button" data-copy="check">Copy self-check command</button></div>
+<p class="muted">Developer ID signing establishes identity and integrity. It does not guarantee safety or replace review of future source changes.</p>
+</main><div id="status" role="status" aria-live="polite" aria-atomic="true"></div>
+<script>
+document.querySelectorAll('button[data-copy]').forEach(button=>button.addEventListener('click',async()=>{
+ const text=document.getElementById(button.dataset.copy).textContent;
+ const status=document.getElementById('status');
+ try{try{if(!navigator.clipboard)throw Error();await navigator.clipboard.writeText(text)}catch(_){const field=document.createElement('textarea');field.value=text;field.readOnly=true;field.style.cssText='position:fixed;left:-9999px';document.body.appendChild(field);try{field.select();if(!document.execCommand('copy'))throw Error()}finally{field.remove()}}status.textContent='Copied to clipboard.'}
+ catch(_){status.textContent='Copy was blocked. Select the text and copy it manually.'}
+ button.focus({preventScroll:true});
+}));
+</script></body></html>

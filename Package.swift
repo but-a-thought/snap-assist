@@ -9,6 +9,7 @@ let package = Package(
             name: "SnapAssist",
             path: "Sources/SnapAssist",
             swiftSettings: [.swiftLanguageMode(.v5)]
-        )
+        ),
+        .testTarget(name: "SnapAssistTests", dependencies: ["SnapAssist"])
     ]
 )

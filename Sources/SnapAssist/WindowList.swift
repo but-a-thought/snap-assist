@@ -32,12 +32,17 @@ struct SystemWindow {
 }
 
 enum WindowList {
-    /// Mission Control, Exposé e Launchpad sono disegnati dal Dock con una
-    /// finestra a tutto schermo sopra a tutto. In quel caso il pannello di
-    /// scelta non deve comparire (né restare aperto).
-    static func isSystemOverlay(windows: [SystemWindow], dockPid: pid_t, screens: [NSScreen]) -> Bool {
+    /// Match the exposé surface, not the Dock's persistent layer-20 canvas.
+    /// Older macOS uses Dock at layer 18; macOS 27 uses WindowManager at 19.
+    /// These compositor details are heuristic and covered by regression checks.
+    static func isSystemOverlay(
+        windows: [SystemWindow], dockPid: pid_t?, screens: [NSScreen],
+        windowManagerPid: pid_t? = nil
+    ) -> Bool {
         for window in windows {
-            guard window.pid == dockPid, window.layer >= 18 else { continue }
+            let legacyExpose = dockPid != nil && window.pid == dockPid && window.layer == 18
+            let currentExpose = windowManagerPid != nil && window.pid == windowManagerPid && window.layer == 19
+            guard legacyExpose || currentExpose else { continue }
             let coversScreen = screens.contains { screen in
                 window.frame.width >= screen.frame.width * 0.8
                     && window.frame.height >= screen.frame.height * 0.8
@@ -53,19 +58,25 @@ enum WindowList {
             kCGNullWindowID
         ) as? [[String: Any]] else { return false }
 
-        guard let dockPid = NSRunningApplication
+        let dockPid = NSRunningApplication
             .runningApplications(withBundleIdentifier: "com.apple.dock")
-            .first?.processIdentifier else { return false }
+            .first?.processIdentifier
+        let windowManagerPid = NSRunningApplication
+            .runningApplications(withBundleIdentifier: "com.apple.WindowManager")
+            .first?.processIdentifier
 
         var windows: [SystemWindow] = []
         for info in raw {
-            guard let layer = number(info[kCGWindowLayer as String])?.intValue, layer >= 18 else { continue }
-            guard let pid = number(info[kCGWindowOwnerPID as String])?.int32Value, pid == dockPid else { continue }
+            guard let layer = number(info[kCGWindowLayer as String])?.intValue else { continue }
+            guard let pid = number(info[kCGWindowOwnerPID as String])?.int32Value,
+                  pid == dockPid || pid == windowManagerPid else { continue }
+            guard let alpha = number(info[kCGWindowAlpha as String])?.doubleValue, alpha > 0.05 else { continue }
             guard let frame = bounds(from: info) else { continue }
             windows.append(SystemWindow(pid: pid, layer: layer, frame: frame))
         }
 
-        return isSystemOverlay(windows: windows, dockPid: dockPid, screens: NSScreen.screens)
+        return isSystemOverlay(windows: windows, dockPid: dockPid, screens: NSScreen.screens,
+                               windowManagerPid: windowManagerPid)
     }
 
     /// True se il rettangolo (coordinate CG) interseca il Dock: la barra non
@@ -83,6 +94,11 @@ enum WindowList {
         for info in raw {
             guard let pid = number(info[kCGWindowOwnerPID as String])?.int32Value, pid == dockPid else { continue }
             guard let frame = bounds(from: info) else { continue }
+            // A screen-sized layer-20 Dock compositor window does not mean
+            // the visible Dock covers every divider on the screen.
+            if number(info[kCGWindowLayer as String])?.intValue == 20,
+               NSScreen.screens.contains(where: { frame.width >= $0.frame.width * 0.8
+                   && frame.height >= $0.frame.height * 0.8 }) { continue }
             if frame.intersects(rect) { return true }
         }
         return false

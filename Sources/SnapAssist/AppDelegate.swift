@@ -450,14 +450,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     }
 
     @objc private func restart() {
-        // Riapre il bundle dopo che questo processo è uscito: evita il vincolo
-        // "istanza unica" e i permessi restano quelli del bundle.
-        let path = Bundle.main.bundleURL.path.replacingOccurrences(of: "'", with: "'\\''")
-        let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/bin/sh")
-        process.arguments = ["-c", "sleep 0.6; open '\(path)'"]
-        try? process.run()
-        NSApp.terminate(nil)
+        AppRestart.restart()
     }
 
     @objc private func quit() {

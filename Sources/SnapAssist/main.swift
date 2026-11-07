@@ -1,5 +1,12 @@
 import AppKit
 
+if CommandLine.arguments.dropFirst().first == AppRestart.helperArgument {
+    exit(AppRestart.runHelper(arguments: CommandLine.arguments))
+}
+if CommandLine.arguments.dropFirst().first == "--prepare-install" {
+    exit(InstallationPreparation.run())
+}
+
 // App di solo menu: nessuna finestra principale, nessuna icona nel Dock.
 let application = NSApplication.shared
 

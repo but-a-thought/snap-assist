@@ -47,7 +47,9 @@ enum Centering {
 
 /// Doppio (o triplo) Control per centrare la finestra in primo piano.
 final class CenterWindowController {
-    var isEnabled = false
+    var isEnabled = false {
+        didSet { reconcileMonitor() }
+    }
     var tapsRequired = 2
     var onCentered: ((pid_t, AXUIElement) -> Void)?
 
@@ -55,9 +57,31 @@ final class CenterWindowController {
     private var sequence = ControlTapSequence()
     private var controlDown = false
     private var usedAsModifier = false
+    private var started = false
+    private let installMonitor: (NSEvent.EventTypeMask, @escaping (NSEvent) -> Void) -> Any?
+    private let removeMonitor: (Any) -> Void
+
+    init(
+        installMonitor: @escaping (NSEvent.EventTypeMask, @escaping (NSEvent) -> Void) -> Any? = {
+            NSEvent.addGlobalMonitorForEvents(matching: $0, handler: $1)
+        },
+        removeMonitor: @escaping (Any) -> Void = { NSEvent.removeMonitor($0) }
+    ) {
+        self.installMonitor = installMonitor
+        self.removeMonitor = removeMonitor
+    }
 
     func start() {
-        stop()
+        started = true
+        reconcileMonitor()
+    }
+
+    private func reconcileMonitor() {
+        guard started, isEnabled else {
+            removeCurrentMonitor()
+            return
+        }
+        guard monitor == nil else { return }
         let mask: NSEvent.EventTypeMask = [
             .flagsChanged,
             .keyDown,
@@ -66,13 +90,18 @@ final class CenterWindowController {
             .otherMouseDown,
             .scrollWheel
         ]
-        monitor = NSEvent.addGlobalMonitorForEvents(matching: mask) { [weak self] event in
+        monitor = installMonitor(mask) { [weak self] event in
             self?.handle(event)
         }
     }
 
     func stop() {
-        if let monitor { NSEvent.removeMonitor(monitor) }
+        started = false
+        removeCurrentMonitor()
+    }
+
+    private func removeCurrentMonitor() {
+        if let monitor { removeMonitor(monitor) }
         monitor = nil
         sequence.reset()
         controlDown = false
@@ -80,6 +109,7 @@ final class CenterWindowController {
     }
 
     private func handle(_ event: NSEvent) {
+        guard started, isEnabled else { return }
         switch event.type {
         case .flagsChanged:
             let control = event.modifierFlags.contains(.control)

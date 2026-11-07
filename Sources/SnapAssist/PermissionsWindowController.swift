@@ -411,12 +411,7 @@ final class PermissionsWindowController: NSWindowController, NSWindowDelegate {
     }
 
     @objc private func restartApp() {
-        let path = Bundle.main.bundleURL.path.replacingOccurrences(of: "'", with: "'\\''")
-        let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/bin/sh")
-        process.arguments = ["-c", "sleep 0.6; open '\(path)'"]
-        try? process.run()
-        NSApp.terminate(nil)
+        AppRestart.restart()
     }
 
     @objc private func closePanel() {

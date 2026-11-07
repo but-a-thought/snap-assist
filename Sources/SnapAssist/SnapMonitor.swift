@@ -25,10 +25,10 @@ final class SnapMonitor {
 
     func start() {
         stop()
-        let timer = Timer(timeInterval: 0.22, repeats: true) { [weak self] _ in
+        let timer = Timer(timeInterval: 0.12, repeats: true) { [weak self] _ in
             self?.tick()
         }
-        timer.tolerance = 0.04
+        timer.tolerance = 0.02
         RunLoop.main.add(timer, forMode: .common)
         self.timer = timer
     }

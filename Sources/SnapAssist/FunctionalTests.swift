@@ -242,7 +242,7 @@ enum FunctionalTests {
         }
 
         expect(
-            WindowList.isSystemOverlay(windows: [window(full, layer: 20, pid: 777)], dockPid: 777, screens: [screen]),
+            WindowList.isSystemOverlay(windows: [window(full, layer: 18, pid: 777)], dockPid: 777, screens: [screen]),
             "overlay di Mission Control riconosciuto"
         )
         expect(
